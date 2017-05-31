@@ -1,101 +1,125 @@
 package C_Methods;
 
-import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 
-import org.apache.poi.EncryptedDocumentException;
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.DataFormatter;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+
 
 public class StepReader {
 	
-	
-	static ArrayList<String> tcid ;
-	static String browser;
-	static double iteration;
-		
- public  void loader() throws IOException, EncryptedDocumentException, InvalidFormatException{
-		
-		
-		String excelfilepath = "./TestData/TestData.xlsx";		
-		 FileInputStream fis = new FileInputStream(new File(excelfilepath));				 
-		 List<String>al = new ArrayList<String>();	
-		 
-		 tcid = new ArrayList<String>();		 
-		 Workbook wb=WorkbookFactory.create(fis);		 
-		 	
-		 
-		// System.out.println(cell1);
-		 
-		 
-		 int total = wb.getNumberOfSheets();
-		 
-		for (int i = 0; i < total; ++i) {
-			
-	
-		 
-		 System.out.println("Current Sheet:"+wb.getSheetAt(i).getSheetName());
-		 
-	    		Sheet currentsheet = wb.getSheetAt(i);
-	    		Iterator<Row> ritr = currentsheet.iterator();
-	    		
-	    		while(ritr.hasNext()){
-	    			Row nextRow = ritr.next();
-	    			
-	    			if(nextRow.getRowNum()==0){
-	    				
-	    				continue;
-	    			}
-	    			
-	    			
-	    			if(nextRow.getRowNum() == currentsheet.getLastRowNum()+1){
-	    				break;
-	    			}
-	    			
-	    			Iterator<Cell> citr = nextRow.cellIterator();	    			
-	    			
-	    			while(citr.hasNext()){  
-	    				
-	    				Cell cell  = citr.next();
-	    				
-	    				
-	    				DataFormatter formatter = new DataFormatter();	    				
-	    				al.add(formatter.formatCellValue(cell));
-	    				
-	    			}	
-	    			
-	    			  
-	    			
-	    			System.out.println(al);
-	    			
-	    			//drive test
-	    			
-	    			al.clear();	    			
-	    			
-	    		}
-	    		
-	    		
-	    		
-	    		
-		
-		
-	
 
-	
+		private static XSSFSheet ExcelWSheet;
+
+		private static XSSFWorkbook ExcelWBook;
+
+		private static XSSFCell Cell;
+
+		private static XSSFRow Row;
+
+	public static Object[][] getTableArray() throws Exception {   
+
+	   String[][] tabArray = null;
+	   String FilePath;
+	   try {
+		   
+		   FilePath = "./TestData/TestData.xlsx";
+
+		   FileInputStream ExcelFile = new FileInputStream(FilePath);
+
+		   // Access the required test data sheet
+
+		   ExcelWBook = new XSSFWorkbook(ExcelFile);
+
+		   ExcelWSheet = ExcelWBook.getSheetAt(0);
+
+		   int startRow = 1;
+
+		   int startCol = 1;
+
+		   int ci,cj;
+
+		   int totalRows = ExcelWSheet.getLastRowNum();
+
+		   // you can write a function as well to get Column count
+
+		   int totalCols = 4;
+
+		   tabArray=new String[totalRows][totalCols];
+
+		   ci=0;
+
+		   for (int i=startRow;i<=totalRows;i++, ci++) {           	   
+
+			  cj=0;
+
+			   for (int j=startCol;j<=totalCols;j++, cj++){
+
+				   tabArray[ci][cj]=getCellData(i,j);
+
+				   System.out.println(tabArray[ci][cj]);  
+
+					}
+
+				}
+
+			}
+
+		catch (FileNotFoundException e){
+
+			System.out.println("Could not read the Excel sheet");
+
+			e.printStackTrace();
+
+			}
+
+		catch (IOException e){
+
+			System.out.println("Could not read the Excel sheet");
+
+			e.printStackTrace();
+
+			}
+
+		return(tabArray);
+
 		}
-		
+
+	public static String getCellData(int RowNum, int ColNum) throws Exception {
+
+		try{
+
+			Cell = ExcelWSheet.getRow(RowNum).getCell(ColNum);
+
+			int dataType = Cell.getCellType();
+
+			if  (dataType == 3) {
+
+				return "";
+
+			}else{
+
+				String CellData = Cell.getStringCellValue();
+
+				return CellData;
+
+			}
+		}catch (Exception e){
+
+			System.out.println(e.getMessage());
+
+			throw (e);
+
+			}
 
 		
+
+	}
 	
  }
-}
+
